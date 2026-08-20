@@ -1,0 +1,5 @@
+$kind: http-request
+description: ""
+url: http://127.0.0.1:8000/posts/100
+method: GET
+order: 3986315411916619

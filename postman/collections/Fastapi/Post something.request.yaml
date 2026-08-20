@@ -1,0 +1,15 @@
+$kind: http-request
+description: ""
+url: http://127.0.0.1:8000/posts
+method: POST
+body:
+  type: json
+  content: |
+    {
+       "title":"Top places to visit in ajmer",
+       "content":"Best places in the city",
+       "rating":4 
+       
+       
+    }
+order: 3150601855739398

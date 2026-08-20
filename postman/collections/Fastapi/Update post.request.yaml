@@ -1,0 +1,12 @@
+$kind: http-request
+description: ""
+url: http://127.0.0.1:8000/posts/1
+method: PUT
+body:
+  type: json
+  content: |-
+    {
+        "title": "title"
+        ,"content": "content"
+    }
+order: 4348773794954042
