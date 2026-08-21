@@ -1,0 +1,27 @@
+from fastapi import APIRouter, status, HTTPException, Depends
+from sqlalchemy.orm import Session
+from .. import models
+from app import schemas ,database,auth2
+
+router = APIRouter(
+    prefix="/vote",
+    tags=['Votes']
+)
+
+@router.post('/', status_code=status.HTTP_201_CREATED)
+def vote(vote:schemas.Vote , db :Session = Depends(database.get_db),current_user: int = Depends(auth2.get_current_user)):
+    vote_query = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.User.id == current_user.id)
+    found_user = vote_query.first()
+    if (vote.dir == 1):
+        if found_user:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"user {current_user.id} has already voted on post {vote.post_id}")
+        new_vote = models.Vote(post_id=vote.post_id, user_id=current_user.id)
+        db.add(new_vote)
+        db.commit()
+        return {"message": "successfully added vote"}
+    else:
+        if not found_user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user {current_user.id} has not voted on post {vote.post_id}")
+        vote_query.delete(synchronize_session=False)
+        db.commit()
+        return {"message": "successfully deleted vote"}
