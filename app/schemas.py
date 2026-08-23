@@ -35,6 +35,7 @@ class PostCreate(PostBase):
     pass
 
 class ResponsePost(PostBase):
+    id: int
     title: str
     content: str
     published: bool
