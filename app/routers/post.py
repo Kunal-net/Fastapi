@@ -1,8 +1,9 @@
-from ..schemas import PostCreate ,ResponsePost
+from ..schemas import PostCreate ,ResponsePost , PostOut
 from fastapi import Response, status, HTTPException,Depends, APIRouter
 
 from ..database import get_db
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from .. import models
 from typing import List,Optional
 from .. import auth2
@@ -88,13 +89,14 @@ def update_post(id: int, updated_post: PostCreate,db: Session = Depends(get_db),
 
 
 
-@router.get('/', response_model=List[ResponsePost])
+@router.get('/', response_model=List[PostOut])
 def get_posts(db: Session = Depends(get_db),Limit: int = 10,skip :int = 0,search: Optional[str]=''):
     #cursor.execute("""SELECT * FROM posts""")
     #posts = cursor.fetchall()
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(Limit).offset(skip).all()
-    return posts
-
+    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id , isouter = True
+        ).filter(models.Post.title.contains(search)).group_by(models.Post.id).limit(Limit).offset(skip).all()
+    return [{"Post": post, "votes": votes} for post, votes in results]
 
 
 @router.post('/',status_code=status.HTTP_201_CREATED, response_model=ResponsePost)

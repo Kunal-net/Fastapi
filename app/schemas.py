@@ -29,7 +29,8 @@ class PostBase(BaseModel):
     title: str
     content: str
     published: bool = True
-   
+
+
 
 class PostCreate(PostBase):
     pass
@@ -44,7 +45,9 @@ class ResponsePost(PostBase):
     class Config:
         from_attributes = True
 
-
+class PostOut(BaseModel):
+    Post : ResponsePost
+    votes : int
 
 class Token(BaseModel):
     access_token: str
