@@ -24,5 +24,6 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('title', sa.String(255), nullable=False),
     )
+    
 def downgrade() -> None:
     op.drop_table('post')

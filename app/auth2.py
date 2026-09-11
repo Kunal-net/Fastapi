@@ -8,7 +8,10 @@ from . import database
 from . import models
 from .config import settings
 
+from typing import Optional
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl='login', auto_error=False)
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
@@ -45,3 +48,17 @@ def get_current_user(token:str = Depends(oauth2_scheme),db: Session = Depends(da
     token = verify_jwt_token(token, credentials_exception)
     user = db.query(models.User).filter(models.User.id == token.id).first()
     return user
+
+
+def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme_optional), db: Session = Depends(database.get_db)) -> Optional[models.User]:
+    if not token:
+        return None
+    try:
+        credentials_exception = HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                              detail=f"Could not validate credentials",
+                                              headers={"WWW-Authenticate": "Bearer"})
+        token_data = verify_jwt_token(token, credentials_exception)
+        user = db.query(models.User).filter(models.User.id == token_data.id).first()
+        return user
+    except Exception:
+        return None

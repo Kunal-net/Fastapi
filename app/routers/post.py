@@ -33,7 +33,7 @@ def find_index_post(id: int):
 
 
 @router.get('/{id}', response_model=List[PostOut])
-def get_post(id: int, db : Session = Depends(get_db),user_id: int = Depends(auth2.get_current_user)):
+def get_post(id: int, db : Session = Depends(get_db), current_user: Optional[models.User] = Depends(auth2.get_current_user_optional)):
     # cursor.execute("""SELECT * FROM posts WHERE id = %s""",(str(id),))
     # post = cursor.fetchone()
     #post = db.query(models.Post).filter(models.Post.id == id).first()
